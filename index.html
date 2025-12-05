@@ -10,18 +10,12 @@
 
   <!-- Vue 3 -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    .scrollbar-hide::-webkit-scrollbar {
-      display: none;
-    }
-    .scrollbar-hide {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
     .sheet-enter-from,
     .sheet-leave-to {
@@ -33,8 +27,7 @@
       transition: 0.25s;
     }
 
-    html,
-    body {
+    html, body {
       overscroll-behavior: none;
       background: #f2f2f2;
     }
@@ -74,7 +67,7 @@
           <span
             class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"
           ></span>
-          <span>12/20–12/24</span>
+          <span>2025/12/20–12/24</span>
         </span>
       </div>
 
@@ -83,14 +76,12 @@
         class="px-5 pt-3 pb-2 bg-gradient-to-b from-[#f7f7f7] to-[#efefef]
                    shrink-0 z-10 border-b border-gray-200"
       >
-        <h1
-          class="text-lg font-semibold text-gray-900 tracking-tight"
-        >
+        <h1 class="text-lg font-semibold text-gray-900 tracking-tight">
           福岡家族旅遊行程
         </h1>
 
         <p class="text-xs text-gray-500 mt-1">
-          左右滑動切日期，點行程查看補充說明。
+          左右滑動切換日期，點行程看亮點與備註。
         </p>
 
         <!-- 日期滑動列表 -->
@@ -112,7 +103,6 @@
                 Day {{ index + 1 }}
               </span>
 
-              <!-- 天氣 icon -->
               <span
                 v-if="dayWeathers[index]"
                 class="text-[11px] text-gray-600"
@@ -140,6 +130,7 @@
           </button>
         </div>
       </header>
+
       <!-- ====================== -->
       <!-- 行程列表（內部可捲動） -->
       <!-- ====================== -->
@@ -154,48 +145,92 @@
                  active:scale-[0.98] cursor-pointer transition-all"
           :class="evt.type === 'transit' ? 'py-2 px-3' : 'py-3 px-4'"
         >
-
-          <!-- 左側色條（莫蘭迪色） -->
+          <!-- 左側莫蘭迪色條 -->
           <div
             class="w-[6px] rounded-full mr-3"
             :style="{ backgroundColor: barColor(evt.type) }"
           ></div>
 
-          <!-- 右側內容 -->
-          <div class="flex-1">
+          <!-- 右側內容（時間+ICON欄 + 文案欄） -->
+          <div class="flex-1 flex gap-3">
 
-            <!-- 第一行：時間 + 標題 -->
-            <div class="flex items-center gap-2 mb-1">
-              <div
-                class="font-semibold text-gray-900 tracking-tight"
-                :class="evt.type === 'transit' ? 'text-[14px]' : 'text-[15px]'"
-              >
+            <!-- 左欄：時間 + ICON 垂直置中 -->
+            <div class="w-[86px] flex flex-col items-center justify-center pt-1">
+              <!-- 時間（大標題的一部分） -->
+              <div class="text-[13px] font-semibold text-gray-900 text-center">
                 {{ evt.time }}
               </div>
+              <!-- ICON（簡約線條 SVG） -->
+              <div class="mt-1">
+                <!-- 飛機 -->
+                <svg
+                  v-if="evt.type === 'flight'"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-7 h-7"
+                  :style="{ color: iconColor(evt.type) }"
+                >
+                  <path d="M10 21l1.5-4.5L8 13 5 14l-1-2.5 4-2.5L8 5.5 9.5 4l3 4 4-2.5c.7-.4 1.6-.1 2 .6.4.7.1 1.6-.6 2l-4 2.5 1 7L13 21l-2.5-3z" />
+                </svg>
 
-              <div
-                class="text-gray-800 font-medium line-clamp-1"
-                :class="evt.type === 'transit' ? 'text-[13px]' : 'text-[14px]'"
-              >
-                {{ evt.title }}
+                <!-- 車程 -->
+                <svg
+                  v-else-if="evt.type === 'transit'"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-7 h-7"
+                  :style="{ color: iconColor(evt.type) }"
+                >
+                  <rect x="3.5" y="8" width="17" height="7" rx="2" />
+                  <path d="M7 18h1" />
+                  <path d="M16 18h1" />
+                  <circle cx="8" cy="17.5" r="1.2" />
+                  <circle cx="16" cy="17.5" r="1.2" />
+                </svg>
+
+                <!-- 停留 -->
+                <svg
+                  v-else
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="w-7 h-7"
+                  :style="{ color: iconColor(evt.type) }"
+                >
+                  <path d="M12 21s-5-5.2-5-9.2A5 5 0 0 1 17 11.8C17 15.8 12 21 12 21z" />
+                  <circle cx="12" cy="11" r="2.2" />
+                </svg>
               </div>
             </div>
 
-            <!-- 第二行：ICON + 亮點（摘要） -->
-            <div class="flex items-start mb-1">
-
-              <!-- ICON（加大 28px） -->
+            <!-- 右欄：標題 / 亮點 / 備註 -->
+            <div class="flex-1 flex flex-col justify-center">
+              <!-- 大標題：地點（行程主標） -->
               <div
-                class="text-[28px] leading-none mr-2"
-                :style="{ color: iconColor(evt.type) }"
+                class="font-semibold text-gray-900"
+                :class="evt.type === 'transit' ? 'text-[14px]' : 'text-[15px]'"
               >
-                {{ icon(evt.type) }}
+                {{ evt.title }}
               </div>
 
-              <!-- 亮點摘要（最多顯示 1 個） -->
-              <div class="text-[13px] text-gray-800 leading-snug flex-1">
+              <!-- 小標題：亮點（只顯示一個） -->
+              <div class="mt-1 text-[13px] text-gray-800 leading-snug">
+                <span class="font-semibold text-gray-900">⭐</span>
                 <template v-if="evt.highlights && evt.highlights.length">
-                  <span class="font-semibold text-gray-900">⭐</span>
                   {{ evt.highlights[0] }}
                   <span
                     v-if="evt.highlights.length > 1"
@@ -204,39 +239,28 @@
                     （更多）
                   </span>
                 </template>
-
-                <template v-else>
-                  <span class="text-gray-400">⭐ —</span>
-                </template>
-              </div>
-            </div>
-
-            <!-- 第三行：備註摘要 -->
-            <div class="flex items-start">
-
-              <!-- 空白讓備註縮排對齊 ICON 下方 -->
-              <div class="w-[28px] mr-2"></div>
-
-              <div class="text-[13px] text-gray-700 leading-snug flex-1">
-                <span class="font-semibold text-gray-900">🔎 備註：</span>
-
-                <template v-if="evt.note && evt.note.length">
-                  <span class="line-clamp-1">{{ evt.note }}</span>
-                </template>
-
                 <template v-else>
                   <span class="text-gray-400">—</span>
                 </template>
               </div>
 
+              <!-- 備註摘要 -->
+              <div class="mt-1 text-[13px] text-gray-700 leading-snug">
+                <span class="font-semibold text-gray-900">🔎</span>
+                <template v-if="evt.note && evt.note.length">
+                  <span class="line-clamp-1">{{ evt.note }}</span>
+                </template>
+                <template v-else>
+                  <span class="text-gray-400">—</span>
+                </template>
+              </div>
             </div>
-
-          </div> <!-- END right column -->
-        </div> <!-- END event card -->
+          </div>
+        </div>
 
         <!-- 新增行程按鈕 -->
         <button
-          @click="createNewEvent"
+          @click.stop="createNewEvent"
           class="w-full bg-white border border-gray-300 text-gray-700
                  rounded-xl py-3 mt-4 text-[14px] font-medium shadow-sm
                  active:scale-[0.98]"
@@ -245,6 +269,7 @@
         </button>
 
       </main>
+
       <!-- ====================== -->
       <!-- 底部資訊面板（彈出式） -->
       <!-- ====================== -->
@@ -259,81 +284,73 @@
           <!-- 拖曳條 -->
           <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
 
-          <!-- 標題 -->
+          <!-- 標題 + 時間 -->
           <h2 class="text-[17px] font-semibold text-gray-900">
             {{ sheetEvent.title }}
           </h2>
-
-          <!-- 時間 -->
           <div class="text-gray-600 text-[14px] mt-1 mb-3">
             {{ sheetEvent.time }}
           </div>
 
           <!-- 亮點（完整） -->
           <div class="mb-3">
-            <h3 class="text-[14px] font-semibold text-gray-900 mb-1">⭐ 亮點</h3>
-
+            <h3 class="text-[14px] font-semibold text-gray-900 mb-1">
+              ⭐ 亮點
+            </h3>
             <div
               v-if="sheetEvent.highlights && sheetEvent.highlights.length"
               class="text-[14px] text-gray-800 leading-relaxed"
             >
               <ul class="list-disc pl-5">
-                <li v-for="h in sheetEvent.highlights" :key="h">{{ h }}</li>
+                <li v-for="h in sheetEvent.highlights" :key="h">
+                  {{ h }}
+                </li>
               </ul>
             </div>
-
-            <div v-else class="text-gray-500 text-[14px]">—</div>
+            <div v-else class="text-[14px] text-gray-500">—</div>
           </div>
 
           <!-- 備註（完整） -->
           <div class="mb-4">
-            <h3 class="text-[14px] font-semibold text-gray-900 mb-1">🔎 備註</h3>
-
+            <h3 class="text-[14px] font-semibold text-gray-900 mb-1">
+              🔎 備註
+            </h3>
             <div
               v-if="sheetEvent.note"
               class="text-[14px] text-gray-800 leading-relaxed whitespace-pre-line"
             >
               {{ sheetEvent.note }}
             </div>
-
-            <div v-else class="text-gray-500 text-[14px]">—</div>
+            <div v-else class="text-[14px] text-gray-500">—</div>
           </div>
 
           <!-- 按鈕列 -->
           <div class="flex gap-3 mt-4">
-
-            <!-- Google Maps 開啟 -->
             <button
-              @click="openInGoogleMap(sheetEvent)"
+              @click.stop="openInGoogleMap(sheetEvent)"
               class="flex-1 bg-[#4A72A0] text-white text-center py-3 rounded-xl
                      text-[15px] font-semibold active:scale-[0.97]"
             >
               使用 Google Maps
             </button>
 
-            <!-- 編輯 -->
             <button
-              @click="openEdit(sheetEvent)"
-              class="flex-1 bg-[#C8C2D6] text-gray-900 text-center py-3 rounded-xl
+              @click.stop="openEdit(sheetEvent)"
+              class="flex-1 bg-[#E0D9EC] text-gray-900 text-center py-3 rounded-xl
                      text-[15px] font-semibold active:scale-[0.97]"
             >
-              編輯
+              編 輯
             </button>
-
           </div>
 
-          <!-- 關閉 -->
           <button
             @click="closeSheet"
             class="mt-4 w-full text-center text-gray-500 text-[13px]"
           >
             關閉
           </button>
-
         </div>
       </transition>
-
-
 
       <!-- ====================== -->
       <!-- 編輯面板（彈出） -->
@@ -345,40 +362,42 @@
                  border-t border-gray-300 shadow-xl pt-4 pb-6 px-5
                  max-w-md mx-auto"
         >
-
-          <!-- 拖曳條 -->
           <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
 
           <h2 class="text-[17px] font-semibold text-gray-900 mb-3">
             編輯行程
           </h2>
 
-          <!-- 標題 -->
-          <label class="block text-[13px] text-gray-600 mt-2 mb-1">標題</label>
+          <label class="block text-[13px] text-gray-600 mt-2 mb-1">
+            標題
+          </label>
           <input
             v-model="editingEvent.title"
             class="w-full border border-gray-300 rounded-lg px-3 py-2 mb-2
                    text-[14px]"
           />
 
-          <!-- 時間 -->
-          <label class="block text-[13px] text-gray-600 mt-2 mb-1">時間</label>
+          <label class="block text-[13px] text-gray-600 mt-2 mb-1">
+            時間
+          </label>
           <input
             v-model="editingEvent.time"
             class="w-full border border-gray-300 rounded-lg px-3 py-2 mb-2
                    text-[14px]"
           />
 
-          <!-- 亮點 -->
-          <label class="block text-[13px] text-gray-600 mt-2 mb-1">亮點（逗號分隔）</label>
+          <label class="block text-[13px] text-gray-600 mt-2 mb-1">
+            亮點（逗號分隔）
+          </label>
           <input
             v-model="editingEvent.highlightsRaw"
             class="w-full border border-gray-300 rounded-lg px-3 py-2 mb-2
                    text-[14px]"
           />
 
-          <!-- 備註 -->
-          <label class="block text-[13px] text-gray-600 mt-2 mb-1">備註</label>
+          <label class="block text-[13px] text-gray-600 mt-2 mb-1">
+            備註
+          </label>
           <textarea
             v-model="editingEvent.note"
             rows="3"
@@ -386,511 +405,503 @@
                    text-[14px]"
           ></textarea>
 
-          <!-- 儲存與取消 -->
           <div class="flex gap-3 mt-4">
             <button
               @click="saveEdit"
               class="flex-1 bg-[#4A72A0] text-white py-3 rounded-xl text-[15px]
                      font-semibold active:scale-[0.97]"
             >
-              儲存
+              儲 存
             </button>
-
             <button
               @click="cancelEdit"
               class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl text-[15px]
                      font-semibold active:scale-[0.97]"
             >
-              取消
+              取 消
             </button>
           </div>
-
         </div>
       </transition>
-      <!-- ====================== -->
-      <!-- Vue APP 建立區 -->
-      <!-- ====================== -->
-
-      <script>
-        const app = Vue.createApp({
-          data() {
-            return {
-              selectedDayId: 1,
-
-              /** ===========================
-               *  行程資料（含營業時間）
-               *  =========================== */
-              days: [
-                { id: 1, dateLabel: "12/20（五）" },
-                { id: 2, dateLabel: "12/21（六）" },
-                { id: 3, dateLabel: "12/22（日）" },
-                { id: 4, dateLabel: "12/23（一）" },
-                { id: 5, dateLabel: "12/24（二）" },
-              ],
-
-              events: [
-
-                /* --------------------
-                 * DAY 1
-                 * -------------------- */
-                {
-                  id: 101,
-                  day: 1,
-                  type: "flight",
-                  time: "08:00–11:15",
-                  title: "長榮 BR106 抵達福岡",
-                  highlights: ["海外抵達"],
-                  note: "入境、取行李\n營業時間：福岡機場 24 小時",
-                  mapsQuery: "Fukuoka Airport",
-                },
-                {
-                  id: 102,
-                  day: 1,
-                  type: "stay",
-                  time: "12:00–13:30",
-                  title: "博多町屋・櫛田神社",
-                  highlights: ["祇園山笠歷史館"],
-                  note: "老街散策\n營業時間：10:00–18:00",
-                  mapsQuery: "Kushida Shrine Hakata",
-                },
-                {
-                  id: 103,
-                  day: 1,
-                  type: "transit",
-                  time: "13:40–14:00",
-                  title: "櫛田神社 → Blossom Hotel",
-                  highlights: [],
-                  note: "車程約 20 分鐘",
-                  mapsQuery: "JR Kyushu Blossom Hotel Hakata",
-                },
-                {
-                  id: 104,
-                  day: 1,
-                  type: "stay",
-                  time: "14:00–16:30",
-                  title: "JR 九州 Blossom Hotel Check-in",
-                  highlights: ["周邊覓食方便"],
-                  note: "營業：24 小時櫃檯",
-                  mapsQuery: "JR Kyushu Blossom Hotel Hakata",
-                },
-                {
-                  id: 105,
-                  day: 1,
-                  type: "stay",
-                  time: "16:30–20:00",
-                  title: "博多運河城",
-                  highlights: ["自由逛街"],
-                  note: "營業：10:00–21:00",
-                  mapsQuery: "Canal City Hakata",
-                },
-
-                /* --------------------
-                 * DAY 2
-                 * -------------------- */
-                {
-                  id: 201,
-                  day: 2,
-                  type: "transit",
-                  time: "09:30–10:00",
-                  title: "前往海之中道海洋世界",
-                  highlights: [],
-                  note: "車程約 30 分鐘",
-                  mapsQuery: "Marine World Uminonakamichi",
-                },
-                {
-                  id: 202,
-                  day: 2,
-                  type: "stay",
-                  time: "10:00–14:00",
-                  title: "海之中道海洋世界 Marine World",
-                  highlights: ["海豹 Go Go Seal"],
-                  note:
-                    "11:00 海豚表演\n12:45 企鵝遊行\n12:00–13:00 Reilly 海景餐廳\n營業：09:30–17:30",
-                  mapsQuery: "Marine World Uminonakamichi",
-                },
-                {
-                  id: 203,
-                  day: 2,
-                  type: "transit",
-                  time: "14:00–14:30",
-                  title: "海洋世界 → 天神 Parco",
-                  highlights: [],
-                  note: "車程約 30 分鐘",
-                  mapsQuery: "Tenjin Parco Fukuoka",
-                },
-                {
-                  id: 204,
-                  day: 2,
-                  type: "stay",
-                  time: "14:30–20:00",
-                  title: "天神街區自由活動",
-                  highlights: ["購物、藥妝、美妝"],
-                  note: "營業時間依店家不同，多數至 20:00",
-                  mapsQuery: "Tenjin Fukuoka",
-                },
-                {
-                  id: 205,
-                  day: 2,
-                  type: "transit",
-                  time: "20:00–20:30",
-                  title: "天神 → Blossom 飯店",
-                  highlights: [],
-                  note: "車程約 20 分鐘",
-                  mapsQuery: "JR Kyushu Blossom Hotel Hakata",
-                },
-
-                /* --------------------
-                 * DAY 3
-                 * -------------------- */
-                {
-                  id: 301,
-                  day: 3,
-                  type: "stay",
-                  time: "08:00–08:30",
-                  title: "飯店 Check-out",
-                  highlights: [],
-                  note: "整理並退房\n營業：24 小時櫃檯",
-                  mapsQuery: "JR Kyushu Blossom Hotel Hakata",
-                },
-                {
-                  id: 302,
-                  day: 3,
-                  type: "transit",
-                  time: "08:30–10:30",
-                  title: "博多 → 九州自然動物園",
-                  highlights: [],
-                  note: "車程約 2 小時",
-                  mapsQuery: "African Safari Oita",
-                },
-                {
-                  id: 303,
-                  day: 3,
-                  type: "stay",
-                  time: "10:30–13:30",
-                  title: "九州自然動物園 African Safari",
-                  highlights: ["叢林巴士"],
-                  note:
-                    "11:00 叢林巴士（50 分）\n12:00–13:00 園內餐廳\n營業：09:00–17:00",
-                  mapsQuery: "African Safari Oita",
-                },
-                {
-                  id: 304,
-                  day: 3,
-                  type: "transit",
-                  time: "13:30–14:00",
-                  title: "動物園 → 湯布院昭和館",
-                  highlights: [],
-                  note: "車程約 30 分鐘",
-                  mapsQuery: "Yufuin Showakan",
-                },
-                {
-                  id: 305,
-                  day: 3,
-                  type: "stay",
-                  time: "14:00–17:30",
-                  title: "湯の坪街道（湯布院）",
-                  highlights: ["花卉村、橫丁、Snoopy店"],
-                  note: "多數店家營業 10:00–17:00",
-                  mapsQuery: "Yufuin, Oita",
-                },
-                {
-                  id: 306,
-                  day: 3,
-                  type: "transit",
-                  time: "17:30–18:00",
-                  title: "湯布院 → 別府",
-                  highlights: [],
-                  note: "車程約 30 分鐘",
-                  mapsQuery: "Beppu Oita",
-                },
-                {
-                  id: 307,
-                  day: 3,
-                  type: "stay",
-                  time: "18:00–21:00",
-                  title: "Check-in 西鐵 Resort Inn 別府",
-                  highlights: ["飯店周邊美食"],
-                  note: "營業：24 小時櫃檯",
-                  mapsQuery: "Nishitetsu Resort Inn Beppu",
-                },
-
-                /* --------------------
-                 * DAY 4
-                 * -------------------- */
-                {
-                  id: 401,
-                  day: 4,
-                  type: "stay",
-                  time: "10:00–10:10",
-                  title: "Resort Inn 別府 Check-out",
-                  highlights: [],
-                  note: "退房\n營業：24 小時櫃檯",
-                  mapsQuery: "Nishitetsu Resort Inn Beppu",
-                },
-                {
-                  id: 402,
-                  day: 4,
-                  type: "transit",
-                  time: "10:10–12:10",
-                  title: "別府 → 太宰府天滿宮",
-                  highlights: [],
-                  note: "車程約 2 小時",
-                  mapsQuery: "Dazaifu Tenmangu",
-                },
-                {
-                  id: 403,
-                  day: 4,
-                  type: "stay",
-                  time: "12:10–13:30",
-                  title: "太宰府天滿宮 + 參道商店街",
-                  highlights: ["梅枝餅"],
-                  note: "營業：09:00–17:00",
-                  mapsQuery: "Dazaifu Tenmangu",
-                },
-                {
-                  id: 404,
-                  day: 4,
-                  type: "stay",
-                  time: "13:30–14:30",
-                  title: "太宰府周邊午餐",
-                  highlights: ["在地餐廳"],
-                  note: "營業時間視店家而定",
-                  mapsQuery: "Dazaifu",
-                },
-                {
-                  id: 405,
-                  day: 4,
-                  type: "stay",
-                  time: "14:30–16:30",
-                  title: "九州國立博物館",
-                  highlights: ["文化展館"],
-                  note: "營業：09:30–17:00（週一休館）",
-                  mapsQuery: "Kyushu National Museum",
-                },
-                {
-                  id: 406,
-                  day: 4,
-                  type: "transit",
-                  time: "17:00–18:00",
-                  title: "太宰府 → 福岡天神昆特薩酒店",
-                  highlights: [],
-                  note: "車程約 1 小時",
-                  mapsQuery: "Quintessa Hotel Fukuoka Tenjin",
-                },
-                {
-                  id: 407,
-                  day: 4,
-                  type: "stay",
-                  time: "18:00–19:00",
-                  title: "Check-in 福岡天神昆特薩酒店",
-                  highlights: ["休息整理"],
-                  note: "營業：24 小時櫃檯",
-                  mapsQuery: "Quintessa Hotel Fukuoka Tenjin",
-                },
-                {
-                  id: 408,
-                  day: 4,
-                  type: "stay",
-                  time: "19:00–21:00",
-                  title: "福岡塔",
-                  highlights: ["夜景・海濱散步"],
-                  note: "營業：09:30–22:00",
-                  mapsQuery: "Fukuoka Tower",
-                },
-
-                /* --------------------
-                 * DAY 5
-                 * -------------------- */
-                {
-                  id: 501,
-                  day: 5,
-                  type: "stay",
-                  time: "11:00–11:10",
-                  title: "福岡天神昆特薩酒店 Check-out",
-                  highlights: [],
-                  note: "退房\n營業：24 小時櫃檯",
-                  mapsQuery: "Quintessa Hotel Fukuoka Tenjin",
-                },
-                {
-                  id: 502,
-                  day: 5,
-                  type: "transit",
-                  time: "11:10–11:20",
-                  title: "飯店 → 麵包超人博物館",
-                  highlights: [],
-                  note: "車程約 10 分鐘",
-                  mapsQuery: "Anpanman Museum Fukuoka",
-                },
-                {
-                  id: 503,
-                  day: 5,
-                  type: "stay",
-                  time: "11:20–12:30",
-                  title: "麵包超人博物館",
-                  highlights: ["親子拍照點"],
-                  note: "營業：10:00–17:00（週二休館）",
-                  mapsQuery: "Anpanman Museum Fukuoka",
-                },
-                {
-                  id: 504,
-                  day: 5,
-                  type: "transit",
-                  time: "12:30–12:50",
-                  title: "麵包超人 → 博多阪急百貨",
-                  highlights: [],
-                  note: "車程約 20 分鐘",
-                  mapsQuery: "Hakata Hankyu",
-                },
-                {
-                  id: 505,
-                  day: 5,
-                  type: "stay",
-                  time: "12:50–17:30",
-                  title: "博多阪急（午餐＋購物）",
-                  highlights: ["Dacomecca"],
-                  note: "營業：10:00–20:00",
-                  mapsQuery: "Hakata Hankyu",
-                },
-                {
-                  id: 506,
-                  day: 5,
-                  type: "transit",
-                  time: "17:30–18:00",
-                  title: "博多阪急 → 福岡機場",
-                  highlights: [],
-                  note: "車程約 20 分鐘",
-                  mapsQuery: "Fukuoka Airport",
-                },
-                {
-                  id: 507,
-                  day: 5,
-                  type: "flight",
-                  time: "20:55–22:40",
-                  title: "長榮 BR101 回程",
-                  highlights: ["返家"],
-                  note: "請提前 2 小時辦理登機\n營業：福岡機場 24 小時",
-                  mapsQuery: "Fukuoka Airport",
-                },
-              ],
-
-              /* 天氣資料 */
-              dayWeathers: [null, null, null, null, null],
-
-              /* 面板控制 */
-              sheetEvent: null,
-              editingEvent: null,
-            };
-          },
-
-          computed: {
-            filteredEvents() {
-              return this.events.filter((e) => e.day === this.selectedDayId);
-            },
-          },
-
-          methods: {
-            selectDay(id) {
-              this.selectedDayId = id;
-              this.sheetEvent = null;
-              this.editingEvent = null;
-            },
-
-            icon(type) {
-              if (type === "flight") return "✈️";
-              if (type === "transit") return "🚗";
-              return "📍";
-            },
-
-            barColor(type) {
-              if (type === "flight") return "#C8C2D6";
-              if (type === "transit") return "#C9D6C5";
-              return "#BFC7DA";
-            },
-
-            iconColor(type) {
-              if (type === "flight") return "#6E6A85";
-              if (type === "transit") return "#6A7A6A";
-              return "#5E6A85";
-            },
-
-            /* Google Maps 開啟 */
-            openInGoogleMap(evt) {
-              const q = encodeURIComponent(evt.mapsQuery);
-              window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, "_blank");
-            },
-
-            /* 展開資訊面板 */
-            openSheet(evt) {
-              this.sheetEvent = JSON.parse(JSON.stringify(evt));
-            },
-
-            closeSheet() {
-              this.sheetEvent = null;
-            },
-
-            /* 編輯模式 */
-            openEdit(evt) {
-              this.editingEvent = JSON.parse(JSON.stringify(evt));
-              this.editingEvent.highlightsRaw = evt.highlights.join(", ");
-            },
-
-            cancelEdit() {
-              this.editingEvent = null;
-            },
-
-            saveEdit() {
-              const target = this.events.find((e) => e.id === this.editingEvent.id);
-              target.title = this.editingEvent.title;
-              target.time = this.editingEvent.time;
-              target.note = this.editingEvent.note;
-              target.highlights =
-                this.editingEvent.highlightsRaw
-                  .split(",")
-                  .map((s) => s.trim())
-                  .filter((s) => s.length > 0);
-
-              this.editingEvent = null;
-              this.sheetEvent = null;
-            },
-
-            /* =============================
-             * 天氣 API（最新 2025 預測）
-             * ============================= */
-            async fetchWeather() {
-              const url = "https://api.open-meteo.com/v1/forecast?latitude=33.5902&longitude=130.4017&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo";
-              const res = await fetch(url);
-              const data = await res.json();
-
-              for (let i = 0; i < 5; i++) {
-                this.dayWeathers[i] = {
-                  max: data.daily.temperature_2m_max[i],
-                  min: data.daily.temperature_2m_min[i],
-                  code: data.daily.weathercode[i],
-                };
-              }
-            },
-
-            weatherEmoji(code) {
-              if (code === 0) return "☀️";
-              if ([1, 2, 3].includes(code)) return "⛅️";
-              if ([45, 48].includes(code)) return "🌫";
-              if ([51, 53, 55, 56, 57].includes(code)) return "🌦";
-              if ([61, 63, 65].includes(code)) return "🌧";
-              if ([71, 73, 75].includes(code)) return "❄️";
-              if ([95, 96, 99].includes(code)) return "⛈";
-              return "🌤";
-            },
-          },
-
-          mounted() {
-            this.fetchWeather();
-          },
-        });
-
-        app.mount("#app");
-      </script>
 
     </div>
   </div>
+
+  <script>
+    const app = Vue.createApp({
+      data() {
+        return {
+          selectedDayId: 1,
+          days: [
+            { id: 1, dateLabel: "12/20（六）" },
+            { id: 2, dateLabel: "12/21（日）" },
+            { id: 3, dateLabel: "12/22（一）" },
+            { id: 4, dateLabel: "12/23（二）" },
+            { id: 5, dateLabel: "12/24（三）" },
+          ],
+          events: [
+            /* Day 1 */
+            {
+              id: 101,
+              day: 1,
+              type: "flight",
+              time: "08:00–11:15",
+              title: "長榮 BR106 抵達福岡",
+              highlights: ["海外抵達"],
+              note: "入境、取行李\n營業時間：福岡機場 24 小時",
+              mapsQuery: "Fukuoka Airport",
+            },
+            {
+              id: 102,
+              day: 1,
+              type: "stay",
+              time: "12:00–13:30",
+              title: "博多町屋・櫛田神社",
+              highlights: ["祇園山笠歷史館"],
+              note: "老街散策\n營業時間：10:00–18:00",
+              mapsQuery: "Kushida Shrine Hakata",
+            },
+            {
+              id: 103,
+              day: 1,
+              type: "transit",
+              time: "13:40–14:00",
+              title: "櫛田神社 → Blossom Hotel",
+              highlights: [],
+              note: "車程約 20 分鐘",
+              mapsQuery: "JR Kyushu Blossom Hotel Hakata",
+            },
+            {
+              id: 104,
+              day: 1,
+              type: "stay",
+              time: "14:00–16:30",
+              title: "JR 九州 Blossom Hotel Check-in",
+              highlights: ["周邊覓食方便"],
+              note: "營業：24 小時櫃檯",
+              mapsQuery: "JR Kyushu Blossom Hotel Hakata",
+            },
+            {
+              id: 105,
+              day: 1,
+              type: "stay",
+              time: "16:30–20:00",
+              title: "博多運河城",
+              highlights: ["自由逛街"],
+              note: "營業：10:00–21:00",
+              mapsQuery: "Canal City Hakata",
+            },
+
+            /* Day 2 */
+            {
+              id: 201,
+              day: 2,
+              type: "transit",
+              time: "09:30–10:00",
+              title: "前往海之中道海洋世界",
+              highlights: [],
+              note: "車程約 30 分鐘",
+              mapsQuery: "Marine World Uminonakamichi",
+            },
+            {
+              id: 202,
+              day: 2,
+              type: "stay",
+              time: "10:00–14:00",
+              title: "海之中道海洋世界 Marine World",
+              highlights: ["海豹 Go Go Seal"],
+              note:
+                "11:00 海豚表演\n12:45 企鵝遊行\n12:00–13:00 Reilly 海景餐廳\n營業：09:30–17:30",
+              mapsQuery: "Marine World Uminonakamichi",
+            },
+            {
+              id: 203,
+              day: 2,
+              type: "transit",
+              time: "14:00–14:30",
+              title: "海洋世界 → 天神 Parco",
+              highlights: [],
+              note: "車程約 30 分鐘",
+              mapsQuery: "Tenjin Parco Fukuoka",
+            },
+            {
+              id: 204,
+              day: 2,
+              type: "stay",
+              time: "14:30–20:00",
+              title: "天神街區自由活動",
+              highlights: ["購物、藥妝、美妝"],
+              note: "營業時間依店家不同，多數至 20:00",
+              mapsQuery: "Tenjin Fukuoka",
+            },
+            {
+              id: 205,
+              day: 2,
+              type: "transit",
+              time: "20:00–20:30",
+              title: "天神 → Blossom 飯店",
+              highlights: [],
+              note: "車程約 20 分鐘",
+              mapsQuery: "JR Kyushu Blossom Hotel Hakata",
+            },
+
+            /* Day 3 */
+            {
+              id: 301,
+              day: 3,
+              type: "stay",
+              time: "08:00–08:30",
+              title: "飯店 Check-out",
+              highlights: [],
+              note: "整理並退房\n營業：24 小時櫃檯",
+              mapsQuery: "JR Kyushu Blossom Hotel Hakata",
+            },
+            {
+              id: 302,
+              day: 3,
+              type: "transit",
+              time: "08:30–10:30",
+              title: "博多 → 九州自然動物園",
+              highlights: [],
+              note: "車程約 2 小時",
+              mapsQuery: "African Safari Oita",
+            },
+            {
+              id: 303,
+              day: 3,
+              type: "stay",
+              time: "10:30–13:30",
+              title: "九州自然動物園 African Safari",
+              highlights: ["叢林巴士"],
+              note:
+                "11:00 叢林巴士（50 分）\n12:00–13:00 園內餐廳\n營業：09:00–17:00",
+              mapsQuery: "African Safari Oita",
+            },
+            {
+              id: 304,
+              day: 3,
+              type: "transit",
+              time: "13:30–14:00",
+              title: "動物園 → 湯布院昭和館",
+              highlights: [],
+              note: "車程約 30 分鐘",
+              mapsQuery: "Yufuin Showakan",
+            },
+            {
+              id: 305,
+              day: 3,
+              type: "stay",
+              time: "14:00–17:30",
+              title: "湯の坪街道（湯布院）",
+              highlights: ["花卉村、橫丁、Snoopy店"],
+              note: "多數店家營業 10:00–17:00",
+              mapsQuery: "Yufuin, Oita",
+            },
+            {
+              id: 306,
+              day: 3,
+              type: "transit",
+              time: "17:30–18:00",
+              title: "湯布院 → 別府",
+              highlights: [],
+              note: "車程約 30 分鐘",
+              mapsQuery: "Beppu Oita",
+            },
+            {
+              id: 307,
+              day: 3,
+              type: "stay",
+              time: "18:00–21:00",
+              title: "Check-in 西鐵 Resort Inn 別府",
+              highlights: ["飯店周邊美食"],
+              note: "營業：24 小時櫃檯",
+              mapsQuery: "Nishitetsu Resort Inn Beppu",
+            },
+
+            /* Day 4 */
+            {
+              id: 401,
+              day: 4,
+              type: "stay",
+              time: "10:00–10:10",
+              title: "Resort Inn 別府 Check-out",
+              highlights: [],
+              note: "退房\n營業：24 小時櫃檯",
+              mapsQuery: "Nishitetsu Resort Inn Beppu",
+            },
+            {
+              id: 402,
+              day: 4,
+              type: "transit",
+              time: "10:10–12:10",
+              title: "別府 → 太宰府天滿宮",
+              highlights: [],
+              note: "車程約 2 小時",
+              mapsQuery: "Dazaifu Tenmangu",
+            },
+            {
+              id: 403,
+              day: 4,
+              type: "stay",
+              time: "12:10–13:30",
+              title: "太宰府天滿宮 + 參道商店街",
+              highlights: ["梅枝餅"],
+              note: "營業：09:00–17:00",
+              mapsQuery: "Dazaifu Tenmangu",
+            },
+            {
+              id: 404,
+              day: 4,
+              type: "stay",
+              time: "13:30–14:30",
+              title: "太宰府周邊午餐",
+              highlights: ["在地餐廳"],
+              note: "營業時間視店家而定",
+              mapsQuery: "Dazaifu",
+            },
+            {
+              id: 405,
+              day: 4,
+              type: "stay",
+              time: "14:30–16:30",
+              title: "九州國立博物館",
+              highlights: ["文化展館"],
+              note: "營業：09:30–17:00（週一休館）",
+              mapsQuery: "Kyushu National Museum",
+            },
+            {
+              id: 406,
+              day: 4,
+              type: "transit",
+              time: "17:00–18:00",
+              title: "太宰府 → 福岡天神昆特薩酒店",
+              highlights: [],
+              note: "車程約 1 小時",
+              mapsQuery: "Quintessa Hotel Fukuoka Tenjin",
+            },
+            {
+              id: 407,
+              day: 4,
+              type: "stay",
+              time: "18:00–19:00",
+              title: "Check-in 福岡天神昆特薩酒店",
+              highlights: ["休息整理"],
+              note: "營業：24 小時櫃檯",
+              mapsQuery: "Quintessa Hotel Fukuoka Tenjin",
+            },
+            {
+              id: 408,
+              day: 4,
+              type: "stay",
+              time: "19:00–21:00",
+              title: "福岡塔",
+              highlights: ["夜景・海濱散步"],
+              note: "營業：09:30–22:00",
+              mapsQuery: "Fukuoka Tower",
+            },
+
+            /* Day 5 */
+            {
+              id: 501,
+              day: 5,
+              type: "stay",
+              time: "11:00–11:10",
+              title: "福岡天神昆特薩酒店 Check-out",
+              highlights: [],
+              note: "退房\n營業：24 小時櫃檯",
+              mapsQuery: "Quintessa Hotel Fukuoka Tenjin",
+            },
+            {
+              id: 502,
+              day: 5,
+              type: "transit",
+              time: "11:10–11:20",
+              title: "飯店 → 麵包超人博物館",
+              highlights: [],
+              note: "車程約 10 分鐘",
+              mapsQuery: "Anpanman Museum Fukuoka",
+            },
+            {
+              id: 503,
+              day: 5,
+              type: "stay",
+              time: "11:20–12:30",
+              title: "麵包超人博物館",
+              highlights: ["親子拍照點"],
+              note: "營業：10:00–17:00（週二休館）",
+              mapsQuery: "Anpanman Museum Fukuoka",
+            },
+            {
+              id: 504,
+              day: 5,
+              type: "transit",
+              time: "12:30–12:50",
+              title: "麵包超人 → 博多阪急百貨",
+              highlights: [],
+              note: "車程約 20 分鐘",
+              mapsQuery: "Hakata Hankyu",
+            },
+            {
+              id: 505,
+              day: 5,
+              type: "stay",
+              time: "12:50–17:30",
+              title: "博多阪急（午餐＋購物）",
+              highlights: ["Dacomecca"],
+              note: "營業：10:00–20:00",
+              mapsQuery: "Hakata Hankyu",
+            },
+            {
+              id: 506,
+              day: 5,
+              type: "transit",
+              time: "17:30–18:00",
+              title: "博多阪急 → 福岡機場",
+              highlights: [],
+              note: "車程約 20 分鐘",
+              mapsQuery: "Fukuoka Airport",
+            },
+            {
+              id: 507,
+              day: 5,
+              type: "flight",
+              time: "20:55–22:40",
+              title: "長榮 BR101 回程",
+              highlights: ["返家"],
+              note: "請提前 2 小時辦理登機\n營業：福岡機場 24 小時",
+              mapsQuery: "Fukuoka Airport",
+            },
+          ],
+
+          dayWeathers: [null, null, null, null, null],
+
+          sheetEvent: null,
+          editingEvent: null,
+        };
+      },
+
+      computed: {
+        filteredEvents() {
+          return this.events.filter((e) => e.day === this.selectedDayId);
+        },
+      },
+
+      methods: {
+        selectDay(id) {
+          this.selectedDayId = id;
+          this.sheetEvent = null;
+          this.editingEvent = null;
+        },
+
+        barColor(type) {
+          if (type === "flight") return "#C8C2D6"; // 飛機：莫蘭迪紫灰
+          if (type === "transit") return "#C9D6C5"; // 車程：莫蘭迪綠灰
+          return "#BFC7DA";                         // 停留：莫蘭迪藍灰
+        },
+
+        iconColor(type) {
+          if (type === "flight") return "#6E6A85";
+          if (type === "transit") return "#6A7A6A";
+          return "#5E6A85";
+        },
+
+        openSheet(evt) {
+          this.sheetEvent = JSON.parse(JSON.stringify(evt));
+        },
+
+        closeSheet() {
+          this.sheetEvent = null;
+        },
+
+        openInGoogleMap(evt) {
+          const q = encodeURIComponent(evt.mapsQuery || evt.title);
+          window.open(
+            `https://www.google.com/maps/search/?api=1&query=${q}`,
+            "_blank"
+          );
+        },
+
+        openEdit(evt) {
+          this.editingEvent = JSON.parse(JSON.stringify(evt));
+          this.editingEvent.highlightsRaw = evt.highlights.join(", ");
+        },
+
+        cancelEdit() {
+          this.editingEvent = null;
+        },
+
+        saveEdit() {
+          const target = this.events.find((e) => e.id === this.editingEvent.id);
+          if (!target) return;
+          target.title = this.editingEvent.title;
+          target.time = this.editingEvent.time;
+          target.note = this.editingEvent.note;
+          target.highlights =
+            this.editingEvent.highlightsRaw
+              .split(",")
+              .map((s) => s.trim())
+              .filter((s) => s.length > 0);
+
+          this.editingEvent = null;
+          this.sheetEvent = null;
+        },
+
+        async fetchWeather() {
+          try {
+            const url =
+              "https://api.open-meteo.com/v1/forecast" +
+              "?latitude=33.5902&longitude=130.4017" +
+              "&daily=weathercode,temperature_2m_max,temperature_2m_min" +
+              "&timezone=Asia%2FTokyo";
+            const res = await fetch(url);
+            const data = await res.json();
+
+            for (let i = 0; i < 5; i++) {
+              this.dayWeathers[i] = {
+                max: data.daily.temperature_2m_max[i],
+                min: data.daily.temperature_2m_min[i],
+                code: data.daily.weathercode[i],
+              };
+            }
+          } catch (e) {
+            console.error("weather error", e);
+          }
+        },
+
+        weatherEmoji(code) {
+          if (code === 0) return "☀️";
+          if ([1, 2, 3].includes(code)) return "⛅️";
+          if ([45, 48].includes(code)) return "🌫";
+          if ([51, 53, 55, 56, 57].includes(code)) return "🌦";
+          if ([61, 63, 65].includes(code)) return "🌧";
+          if ([71, 73, 75].includes(code)) return "❄️";
+          if ([95, 96, 99].includes(code)) return "⛈";
+          return "🌤";
+        },
+
+        createNewEvent() {
+          const newId = Date.now();
+          const evt = {
+            id: newId,
+            day: this.selectedDayId,
+            type: "stay",
+            time: "時間待定",
+            title: "新行程",
+            highlights: [],
+            note: "備註待填寫",
+            mapsQuery: "Fukuoka",
+          };
+          this.events.push(evt);
+          this.openEdit(evt);
+        },
+      },
+
+      mounted() {
+        this.fetchWeather();
+      },
+    });
+
+    app.mount("#app");
+  </script>
 </body>
 </html>
