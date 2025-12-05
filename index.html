@@ -69,7 +69,7 @@
             福岡家族旅遊行程
           </h1>
           <p class="text-xs text-gray-500 mt-1">
-            左右滑動切換日期，點行程先看內容，再決定要不要編輯或導航。
+            左右滑動切換日期，點行程先看內容，再決定要不要編輯或在 Google Maps 開啟。
           </p>
 
           <!-- 日期＋天氣，橫向滑動 -->
@@ -236,7 +236,7 @@
             <div class="px-3 pt-2 flex items-center justify-between">
               <div>
                 <p class="text-[11px] text-gray-500 uppercase tracking-wide">
-                  MAP &amp; NAVIGATION
+                  MAP &amp; LOCATION
                 </p>
                 <p class="text-xs text-gray-900 mt-0.5 truncate">
                   {{ currentLocationTitle }}
@@ -247,7 +247,7 @@
                 class="ml-2 text-[11px] px-2.5 py-1.5 rounded-full bg-[#2563EB] text-white font-semibold shadow hover:bg-[#1D4ED8] transition"
                 @click.stop="openInGoogleMaps"
               >
-                導航前往
+                在 Google Maps 開啟
               </button>
             </div>
             <div class="flex-1 mt-1">
@@ -284,7 +284,7 @@
             @click.self="closePreview"
           >
             <div
-              class="w-full bg-white rounded-t-3xl border-t border-gray-200 px-4 pt-3 pb-4 max-h-[80%] overflow-y-auto"
+              class="w-full bg白 rounded-t-3xl border-t border-gray-200 px-4 pt-3 pb-4 max-h-[80%] overflow-y-auto bg-white"
             >
               <div class="flex items-center justify-between mb-2">
                 <div>
@@ -341,7 +341,7 @@
                   class="flex-1 rounded-2xl bg-[#2563EB] text-white text-xs font-semibold py-2.5 shadow hover:bg-[#1D4ED8] transition"
                   @click="openInGoogleMaps"
                 >
-                  導航前往
+                  在 Google Maps 開啟
                 </button>
                 <button
                   type="button"
@@ -407,7 +407,7 @@
 
                 <div>
                   <label class="block text-[11px] text-gray-500 mb-1"
-                    >地點（用於地圖與導航）</label
+                    >地點（用於地圖與 Google Maps 開啟）</label
                   >
                   <input
                     v-model="editingItem.location"
@@ -539,6 +539,7 @@
           mapEmbedUrl() {
             if (!this.currentLocation) return '';
             const q = encodeURIComponent(this.currentLocation);
+            // 使用 search 模式，只顯示地點，不帶路線
             return `https://www.google.com/maps?q=${q}&output=embed`;
           }
         },
@@ -890,7 +891,7 @@
 
           loadFromStorage() {
             try {
-              const raw = localStorage.getItem('fukuokaTripAppV4');
+              const raw = localStorage.getItem('fukuokaTripAppV5');
               if (raw) {
                 const data = JSON.parse(raw);
                 if (data.days && Array.isArray(data.days) && data.days.length > 0) {
@@ -912,7 +913,7 @@
               selectedDayId: this.selectedDayId,
               selectedItemId: this.selectedItemId
             };
-            localStorage.setItem('fukuokaTripAppV4', JSON.stringify(payload));
+            localStorage.setItem('fukuokaTripAppV5', JSON.stringify(payload));
           },
 
           // UI
@@ -1010,11 +1011,12 @@
             this.saveToStorage();
           },
 
+          // ✅ 改成「在 Google Maps 開啟地點」（search 模式，不導航）
           openInGoogleMaps() {
             if (!this.currentLocation) return;
-            const dest = encodeURIComponent(this.currentLocation);
+            const q = encodeURIComponent(this.currentLocation);
             window.open(
-              `https://www.google.com/maps/dir/?api=1&destination=${dest}`,
+              `https://www.google.com/maps/search/?api=1&query=${q}`,
               '_blank'
             );
           },
