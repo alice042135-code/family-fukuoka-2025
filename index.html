@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
@@ -244,3 +244,254 @@
             <input type="text" v-model="editingEvent.title"
               class="w-full mt-1 px-3 py-2 rounded-xl border
                      border-gray-300 text-[14px]">
+          </div>
+
+          <div>
+            <label class="text-[13px] font-semibold text-gray-700">行程類型</label>
+            <select v-model="editingEvent.type"
+              class="w-full mt-1 px-3 py-2 rounded-xl border
+                     border-gray-300 text-[14px]">
+              <option value="flight">✈️ 飛機</option>
+              <option value="transit">🚗 車程</option>
+              <option value="stay">📍 停留</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-[13px] font-semibold text-gray-700">備註 Notes</label>
+            <textarea v-model="editingEvent.note" rows="3"
+              class="w-full mt-1 px-3 py-2 rounded-xl border
+                     border-gray-300 text-[14px]"></textarea>
+          </div>
+
+          <div>
+            <label class="text-[13px] font-semibold text-gray-700">亮點（每行一項）</label>
+            <textarea v-model="editingEvent.highlightsText" rows="3"
+              class="w-full mt-1 px-3 py-2 rounded-xl border
+                     border-gray-300 text-[14px]"></textarea>
+          </div>
+
+        </div>
+
+        <div class="mt-3 flex gap-3">
+          <button
+            @click="saveEdit"
+            class="flex-1 py-2 rounded-xl text-white font-semibold
+                   text-[14px] active:scale-[0.98]"
+            style="background-color: #3E6F61;"
+          >
+            儲存
+          </button>
+
+          <button
+            @click="cancelEdit"
+            class="w-24 py-2 rounded-xl border border-gray-300
+                   bg-gray-100 text-gray-700 font-semibold text-[14px]
+                   active:scale-[0.98]"
+          >
+            取消
+          </button>
+        </div>
+
+      </div>
+    </transition>
+
+  </div>
+</div>
+
+<script>
+const { createApp } = Vue;
+
+createApp({
+  data() {
+    return {
+      selectedDayId: 1,
+      activeEvent: null,
+      editingEvent: null,
+
+      days: [
+        { id: 1, dateLabel: "12/20（六）" },
+        { id: 2, dateLabel: "12/21（日）" },
+        { id: 3, dateLabel: "12/22（一）" },
+        { id: 4, dateLabel: "12/23（二）" },
+        { id: 5, dateLabel: "12/24（三）" },
+      ],
+
+      dayWeathers: [],
+
+      /* 全部行程資料（略：內容完全保持之前一致） */
+      events: [
+        { id:101,day:1,type:"flight",time:"08:00–11:15",title:"長榮 BR106 抵達福岡",note:"入境、取行李",highlights:[] },
+        { id:102,day:1,type:"stay",time:"12:00–13:30",title:"博多町屋・櫛田神社",highlights:["參觀老街","祇園山笠歷史館"] },
+        { id:103,day:1,type:"transit",time:"13:40–14:00",title:"櫛田神社 → Blossom Hotel",highlights:[] },
+        { id:104,day:1,type:"stay",time:"14:00–16:30",title:"JR 九州 Blossom 飯店 Check-in",note:"寄放行李 & 附近覓食",highlights:[] },
+        { id:105,day:1,type:"stay",time:"16:30–20:00",title:"博多運河城",highlights:["自由活動"] },
+
+        { id:201,day:2,type:"transit",time:"09:30–10:00",title:"前往海之中道海洋世界" },
+        { id:202,day:2,type:"stay",time:"10:00–14:00",title:"海之中道海洋世界 Marine World",note:"12:00–13:00 Reilly 海景餐廳（提前 10 分鐘卡位）",highlights:["10:50 海豹 Go Go Seal","11:00 海豚表演","12:45 企鵝遊行"] },
+        { id:203,day:2,type:"transit",time:"14:00–14:30",title:"海洋世界 → 天神 Parco" },
+        { id:204,day:2,type:"stay",time:"14:30–20:00",title:"天神街區自由活動",highlights:["購物","藥妝","咖啡"] },
+        { id:205,day:2,type:"transit",time:"20:00–20:30",title:"天神 → Blossom 飯店" },
+
+        /* Day3–Day5（略，同前，完整保留你的資料） */
+        { id:301,day:3,type:"stay",time:"08:00–08:30",title:"飯店 Check-out" },
+        { id:302,day:3,type:"transit",time:"08:30–10:30",title:"博多 → 九州自然動物園" },
+        { id:303,day:3,type:"stay",time:"10:30–13:30",title:"九州自然動物園 African Safari",note:"12:00–13:00 園內餐廳午餐",highlights:["11:00 叢林巴士（50 分）","親子體驗","拍照"] },
+        { id:304,day:3,type:"transit",time:"13:30–14:00",title:"動物園 → 湯布院昭和館" },
+        { id:305,day:3,type:"stay",time:"14:00–17:30",title:"湯の坪街道散策（湯布院）",highlights:["花卉村","湯の坪横丁","Snoopy 商店"] },
+        { id:306,day:3,type:"transit",time:"17:30–18:00",title:"湯布院 → 別府" },
+        { id:307,day:3,type:"stay",time:"18:00–21:00",title:"Check-in 西鐵 Resort Inn 別府",highlights:["周邊用餐","自由活動"] },
+
+        { id:401,day:4,type:"stay",time:"10:00–10:10",title:"Resort Inn 別府 Check-out" },
+        { id:402,day:4,type:"transit",time:"10:10–12:10",title:"別府 → 太宰府天滿宮" },
+        { id:403,day:4,type:"stay",time:"12:10–13:30",title:"太宰府天滿宮 + 參道商店街",highlights:["梅枝餅","御守","可愛小店"] },
+        { id:404,day:4,type:"stay",time:"13:30–14:30",title:"太宰府周邊午餐" },
+        { id:405,day:4,type:"stay",time:"14:30–16:30",title:"九州國立博物館" },
+        { id:406,day:4,type:"transit",time:"17:00–18:00",title:"太宰府 → 天神昆特薩酒店" },
+        { id:407,day:4,type:"stay",time:"18:00–19:00",title:"Check-in + 整理休息" },
+        { id:408,day:4,type:"stay",time:"19:00–21:00",title:"福岡塔（晚餐 + 夜景）",highlights:["夕陽","夜景"] },
+
+        { id:501,day:5,type:"stay",time:"11:00–11:10",title:"福岡天神昆特薩酒店 Check-out" },
+        { id:502,day:5,type:"transit",time:"11:10–11:20",title:"飯店 → 麵包超人博物館" },
+        { id:503,day:5,type:"stay",time:"11:20–12:30",title:"麵包超人博物館",highlights:["室內遊具","拍照點","周邊商品"] },
+        { id:504,day:5,type:"transit",time:"12:30–12:50",title:"麵包超人 → 博多阪急" },
+        { id:505,day:5,type:"stay",time:"12:50–17:30",title:"博多阪急（午餐＋購物）",highlights:["Dacomecca","百貨美食"] },
+        { id:506,day:5,type:"transit",time:"17:30–18:00",title:"博多阪急 → 福岡機場" },
+        { id:507,day:5,type:"flight",time:"20:55–22:40",title:"長榮 BR101 回程" }
+      ]
+    };
+  },
+
+  computed: {
+    filteredEvents() {
+      return this.events.filter(e => e.day === this.selectedDayId);
+    }
+  },
+
+  methods: {
+    selectDay(id) { this.selectedDayId = id; this.activeEvent = null; },
+
+    openSheet(evt) {
+      if (this.activeEvent && this.activeEvent.id === evt.id) {
+        this.activeEvent = null;
+      } else this.activeEvent = evt;
+    },
+
+    googleMapsUrl(evt) {
+      return "https://www.google.com/maps/search/?api=1&query=" +
+             encodeURIComponent(evt.title);
+    },
+
+    createNewEvent() {
+      this.editingEvent = {
+        id: Date.now(),
+        day: this.selectedDayId,
+        type: "stay",
+        time: "",
+        title: "",
+        note: "",
+        highlights: [],
+        highlightsText: ""
+      };
+    },
+
+    openEdit(evt) {
+      this.editingEvent = {
+        ...evt,
+        highlightsText: evt.highlights.join("\n")
+      };
+    },
+
+    saveEdit() {
+      this.editingEvent.highlights =
+        this.editingEvent.highlightsText
+          .split("\n")
+          .filter(x => x.trim());
+
+      const idx = this.events.findIndex(e => e.id === this.editingEvent.id);
+      if (idx >= 0) this.events[idx] = { ...this.editingEvent };
+      else this.events.push(this.editingEvent);
+
+      localStorage.setItem("trip2025", JSON.stringify(this.events));
+      this.editingEvent = null;
+    },
+
+    cancelEdit() {
+      this.editingEvent = null;
+    },
+
+    /* ICON（左側） */
+    typeIcon(t) {
+      if (t === "flight") return "✈️";
+      if (t === "transit") return "🚗";
+      return "📍";
+    },
+
+    iconColor(t) {
+      if (t === "flight") return "#6B46A3";
+      if (t === "transit") return "#3E6F61";
+      return "#375A7F";
+    },
+
+    /* 色條顏色 */
+    typeColor(t) {
+      if (t === "flight") return "#D6C4F0";
+      if (t === "transit") return "#BDDCD1";
+      return "#C6D6EB";
+    },
+
+    tagBgColor(t) {
+      if (t === "flight") return "#EFE7F8";
+      if (t === "transit") return "#E6F3EF";
+      return "#E7EFF8";
+    },
+
+    tagTextColor(t) {
+      if (t === "flight") return "#6B46A3";
+      if (t === "transit") return "#3E6F61";
+      return "#375A7F";
+    },
+
+    typeLabel(t) {
+      if (t === "flight") return "✈️ 飛機";
+      if (t === "transit") return "🚗 車程";
+      return "📍 停留";
+    },
+
+    weatherEmoji(code) {
+      if (code === 0) return "☀️";
+      if (code <= 3) return "⛅️";
+      if (code <= 45) return "🌫";
+      if (code <= 55) return "🌦";
+      if (code <= 65) return "🌧";
+      if (code <= 75) return "❄️";
+      return "🌧";
+    },
+
+    async loadWeather() {
+      try {
+        const res = await fetch(
+          "https://api.open-meteo.com/v1/forecast?latitude=33.590&longitude=130.401&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo"
+        );
+        const data = await res.json();
+        this.dayWeathers = data.daily.time.map((t, i) => ({
+          date: t,
+          code: data.daily.weathercode[i],
+          max: data.daily.temperature_2m_max[i],
+          min: data.daily.temperature_2m_min[i]
+        })).slice(0, 5);
+      } catch (e) { console.error(e); }
+    }
+  },
+
+  mounted() {
+    this.loadWeather();
+
+    const saved = localStorage.getItem("trip2025");
+    if (saved) this.events = JSON.parse(saved);
+  }
+}).mount("#app");
+</script>
+
+</body>
+</html>
